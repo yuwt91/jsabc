@@ -3,32 +3,68 @@
 jQuery 
 
 
-### 整个 jQuery 被包在一个 IIFE 中
+###  jQuery 就是一个大型 IIFE 
+IIFE（immediately invoked function expression） 叫做立即调用函数表达式， jQuery 绝大部分源代码放在一个 `IIFE`中，大致浏览了一下它的结构：
+
+#### IIFE 整体结构
+
 ```js
 (function(global, factory){
-	// somecoede
-	// 1. IIFE 有两个参数，其中一个是factory。IIFE 函数内部返回 factory 的调用结果
-  // 2. 调用IIFE 时给 factory 传入了匿名函数，匿名函数作为 factory 变量传入后，被调用
-  // 3. 调用这个匿名函数（在这里叫factory）会发生什么结果？
-  // 4. 会创建一个执行上下文，在其中初始化一些变量、函数，更具体的，需要看传进来的匿名函数
+	// somecode
+	return factory;
+	// 1. IIFE 有两个参数，一个是全局上下文，一个是factory。IIFE 函数内部返回 factory 的调用结果
+  // 2. 调用这个匿名函数（在这里叫factory）会发生什么结果？
+  // 3. 会创建一个执行上下文，在其中初始化一些变量、函数，更具体的，需要看传进来的匿名函数
 	
 })(typeof window !== "undefined" ? window : this, function(window, noGlobal){
-	// 匿名函数里的内容
+	// 1. 第一个参数写了一个三元操作符，用于给 jQuery 传入一个全局上下文，在浏览器中是window
+	// 2. 第二个参数是一个匿名函数，传给 factory，在函数体内部调用
+	// 3. jQuery 的主体代码在这个函数里面
+});
+```
+
+具体内容要看传入  `factory` 的匿名函数。
+#### 传入 `factory` 的匿名函数的内容
+```js
+(function(global, factory){
+// somecode
+})(typeof window !== "undefined" ? window : this, function(window, noGlobal){
+	// 1. 看一下这个名为 jQuery 的函数，它接受不了 selector 作为参数，调用它会返回 new jQuery.fn.init 的结果，这样外界调用jQuery 就不用在前面加 new 操作符。可以看到，jQuery.fn.init 是个构造器函数。
 	var jQuery = function( selector, context ) {
-		return new jQuery.fn.init( selector, context );
-	// jQuery 函数接受选择器作为参数，调用它会返回 new jQuery.fn.init 的结果，这样外界调用jQuery 就不用在前面加 new 操作符。可以看到，jQuery.fn.init 是个构造器函数。
+	return new jQuery.fn.init( selector, context );
 };
 
+// 2. 看一下 jQuery.prototype
+// 我们知道每个函数都有 prototype 属性，当这个函数被当作构造器用时，其 prototype 属性才发挥作用。上面这段代码创建了一个对象，并让它可以通过 jQuery.fn 和 jQuery.prototype 引用。普通函数的 prototype 属性没有用，这么写难道想把 jQuery 当作构造器调用？
 jQuery.fn = jQuery.prototype = {
-// 定义了一些方法，如：
+// somecode
 	constructor: jQuery,
 	length: 0,
 	toArray: function() {return slice.call( this );}
 }; 
-// 我们知道每个函数都有 prototype 属性，当这个函数被当作构造器用时，其 prototype 属性才发挥作用。上面这段代码创建了一个对象，并让它可以通过 jQuery.fn 和 jQuery.prototype 引用。
+
+// 3. 看一下 jQuery.fn.init 的定义
+// 上面提到 jQuery.fn.init 指向一个构造器函数，所以内部代码一定有 this，this 指向 new 出来的空对象，构造器就是给 new 出来的空对象添加属性和方法用的。
+var init = jQuery.fn.init = function(selector, context, root){
+// somecode
+
+// 构造函数的最后一行返回一个 调用 jQuery.makeArray 函数的结果。
+// makeArray 把 this 这个空对象转换成数组
+// 这种做法说明，我们还可以在构造器函数内部，把 this 传给其他函数，对 this 做点什么，然后再把从它构造器函数里返回。
+return jQuery.makeArray( selector, this );
+};
+
+// 这里让 init 的 prototype 属性也指向了 jQuery 函数的 prototype 属性，这样会让 init 构造器产生的对象的原型指向它。jQuery.fn.init 的作用是，接收输入的选择器，$('#id')中的‘#id’，然后返回一个对象，只是做了 jQuery 对象的初始化工作。对象可用的方法是通过 jQuery 的prototype 属性获取的。
+init.prototype = jQuery.fn;
+
+
+
+
 
 });
 ```
+
+
 
 ### jQuery 的代码结构
 
