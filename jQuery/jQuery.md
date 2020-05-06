@@ -29,12 +29,12 @@ IIFE（immediately invoked function expression） 叫做立即调用函数表达
 (function(global, factory){
 // somecode
 })(typeof window !== "undefined" ? window : this, function(window, noGlobal){
-	// 1. 看一下这个名为 jQuery 的函数，它接受不了 selector 作为参数，调用它会返回 new jQuery.fn.init 的结果，这样外界调用jQuery 就不用在前面加 new 操作符。可以看到，jQuery.fn.init 是个构造器函数。
+	// 1. jQuery 函数，它接受 selector 作为参数，调用它会返回 new jQuery.fn.init 的结果，外界调用 $("#id")就是在调用这个函数。可以看到，jQuery.fn.init 是个构造器函数。
 	var jQuery = function( selector, context ) {
 	return new jQuery.fn.init( selector, context );
 };
 
-// 2. 看一下 jQuery.prototype
+// 2. jQuery.prototype jQuery 的原型对象
 // 我们知道每个函数都有 prototype 属性，当这个函数被当作构造器用时，其 prototype 属性才发挥作用。上面这段代码创建了一个对象，并让它可以通过 jQuery.fn 和 jQuery.prototype 引用。普通函数的 prototype 属性没有用，这么写难道想把 jQuery 当作构造器调用？
 jQuery.fn = jQuery.prototype = {
 // somecode
@@ -43,7 +43,7 @@ jQuery.fn = jQuery.prototype = {
 	toArray: function() {return slice.call( this );}
 }; 
 
-// 3. 看一下 jQuery.fn.init 的定义
+// 3. jQuery.fn.init 的定义
 // 上面提到 jQuery.fn.init 指向一个构造器函数，所以内部代码一定有 this，this 指向 new 出来的空对象，构造器就是给 new 出来的空对象添加属性和方法用的。
 var init = jQuery.fn.init = function(selector, context, root){
 // somecode
@@ -57,16 +57,14 @@ return jQuery.makeArray( selector, this );
 // 这里让 init 的 prototype 属性也指向了 jQuery 函数的 prototype 属性，这样会让 init 构造器产生的对象的原型指向它。jQuery.fn.init 的作用是，接收输入的选择器，$('#id')中的‘#id’，然后返回一个对象，只是做了 jQuery 对象的初始化工作。对象可用的方法是通过 jQuery 的prototype 属性获取的。
 init.prototype = jQuery.fn;
 
-
-
-
+...
+// 最后看一下 jQuery 如何暴露到全局对象上
+if ( typeof noGlobal === "undefined" ) {
+	window.jQuery = window.$ = jQuery;
+}
 
 });
 ```
-
-
-
-### jQuery 的代码结构
 
 
 ###  jQuery 对象
@@ -75,11 +73,10 @@ jQuery 对象是个数组对象，数组的原型对象挂着 jQuery 方法。
 即使网页上没有元素，使用 jQuery 选择语法也会返回一个空数组对象，所以不能用简单的
 `if ($('#top')) {}` 来判断网页上是否有 id 为 top 的元素，因为这个判断总是 true，用元素的长素属性来判断：`if ($('#top').length > 0) {}`，或者取出数组中 DOM 元素做判断：`if ($('#top')[0]) {}`
 
-### 创建 jQuery 对象
+以下代码创建一个 jQuery 对象
 ```js
-var $header = $("#header");
+var $header = $("#header"); // 变量名称前加 $ 表示它是 jQuery 对象
 ```
-jQuery 对象是个数组对象
 
 ### 方法链
 
@@ -87,9 +84,25 @@ jQuery 对象是个数组对象
 
 如何实现？
 
-例如：`Obj.method1().method2()` 
+例如：`$obj.method1().method2()` 
 
-`method1` 方法和 `method2` 方法最终都会返回指向`obj` 的` this` 
+$obj 调用`method1` 方法，方法内部对`$obj`做某些加工，最后返回 `this`(即$obj)，加工后的$obj接着调用 `method2` 方法。
+
+```js
+jQuery.fn.extend({ // 这些方法都放在 jQuery 原型上
+	addClass: function(value){
+		// 为对象添加类的实现代码
+		return this;
+	},
+	
+	removeClass: function(value){
+		// 为对象移除类的实现代码
+		return this;
+	}
+});
+```
+
+每次调用方法，都返回一个被加工过的 jQuery 对象，因此可以一直链式调用下去。
 
 
 
