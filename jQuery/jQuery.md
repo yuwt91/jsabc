@@ -1,10 +1,10 @@
 
 
-jQuery 
 
 
-###  jQuery 就是一个大型 IIFE 
-IIFE（immediately invoked function expression） 叫做立即调用函数表达式， jQuery 绝大部分源代码放在一个 `IIFE`中，大致浏览了一下它的结构：
+
+###  jQuery 是一个大型 IIFE 
+IIFE（immediately invoked function expression） 叫做立即调用函数表达式， jQuery 源代码放在一个 `IIFE`中，大致浏览了一下它的结构：
 
 #### IIFE 整体结构
 
@@ -127,7 +127,7 @@ if (typeof noGlobal === strundefined) {
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.5.0.js"></script>
 ```
 
-这些是开发版，包含了注释和缩进，发布前要用打包工具转成压缩版（只有一行），可用在线压缩 JS 工具，或者配置 webpack 
+这些是开发版，包含了注释和缩进，发布前要用打包工具转成压缩版，可用在线压缩 JS 工具，或者配置 webpack 。另一种方法是直接中压缩后的版本。
 
 来源：
 1. [国内 BootCDN jQuery](https://www.bootcdn.cn/jquery/)
