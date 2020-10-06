@@ -10,7 +10,7 @@
 
 ### 2. 列表的ADT
 
-ADT（抽象数据类型）是对一类数据及能对它进行的哪些操作作出的规定，对于列表的特征在 1 中提到，能对列表进行的操作有以下：
+ADT（抽象数据类型）是对一类数据及能对它进行的哪些操作作出的规定，上面提到了列表的特征，那么列表需要支持哪些操作呢？
 
 ```js
 // 移除列表中的所有元素，使之成为空列表
@@ -51,14 +51,14 @@ isAtEnd();
 getValue();
 ```
 
-实现 list，就需要实现上面描述的所有方法。
+如果要实现列表，就可参考上面的方法描述进行实现。
 
 参考：
 [OpenDSA-The List ADT](https://opendsa-server.cs.vt.edu/OpenDSA/Books/CS2/html/ListADT.html#list-terminology-and-notation)
 
-### 3. 用 JavaScript 实现 Array
+### 3. 用 JavaScript 实现 Array class
 
-我原来想用 JavaScript 实现基于数组的列表，但发现按照 list ADT的描述，很多方法无从按照js的逻辑来实现，如当前位置及相关的一连串方法，不知道从何做起，因此这里实现基本的array 方法。
+我原来想用 JavaScript 实现基于数组的列表，但发现按照 list ADT的描述，很多方法无从按照js的逻辑来实现，如当前位置及相关的一连串方法，不知道从何做起，这里就实现一下几个基本的array 方法。
 
 1. 什么是数组
 
@@ -153,6 +153,11 @@ getValue(index){
 }
 
 ```
+
+实际上在 js 已经实现了数组的情况下，再手写数组的方法实现显得多此一举啦，这里就当做一下练习。
+
+删除注释的源代码见当前目录下的：`array.js`
+
 
 
 
